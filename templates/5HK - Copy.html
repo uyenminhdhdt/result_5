@@ -1,0 +1,299 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="number/html; charset=utf-8" />
+    <title>Dự báo khả năng ra trường đúng hạn của sinh viên năm thứ 3</title>
+    <style>
+        .head {
+            width: 98%;
+            height: 9%;
+            background-image: url(../static/13.jpg);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            padding: 1%;
+            color: #FFFFFF;
+        }
+        
+        .head h1 {
+            float: left;
+            margin-top: 0%;
+            margin-left: 6.5%;
+        }
+        
+        .info {
+            width: 89.5%;
+            height: 60px;
+            float: left;
+            margin-left: 5%;
+            margin-top: 0%;
+            border: 2px solid rgb(0, 17, 255);
+            border-radius: 10px;
+        }
+        
+        .info>p>span {
+            margin-left: 10px;
+        }
+        
+        .info>p>input {
+            margin-right: 15px;
+            margin-left: 20px;
+            margin-top: -5px;
+            height: 22px;
+            width: 50%;
+            font-size: 17px;
+            font-weight: bold;
+        }
+        
+        .info>p {
+            font-weight: bolder;
+            font-size: 20px;
+            color: #000000;
+            margin-left: 5%;
+            float: left;
+            width: 28%;
+        }
+        
+        .input {
+            width: 26.3%;
+            height: 40%;
+            float: left;
+            margin-left: 5%;
+            margin-top: 2%;
+            border: 2px solid rgb(0, 17, 255);
+            border-radius: 10px;
+        }
+        
+        .input>p>span {
+            margin-left: 3%;
+        }
+        
+        .input>p>input {
+            float: right;
+            margin-right: 3%;
+            margin-top: -1%;
+            width: 28%;
+            font-size: 88%;
+            font-weight: bold;
+        }
+        
+        .input>p {
+            font-weight: bolder;
+            font-size: 128%;
+            color: #000000;
+        }
+        
+        .ket_qua {
+            width: 37%;
+            font-family: sans-serif;
+            font-size: x-large;
+            color: #ff0000;
+            font-weight: bolder;
+            margin-left: 63%;
+            margin-top: 27%;
+        }
+        
+        .btn {
+            width: 20%;
+            float: right;
+            margin-right: 8%;
+            margin-top: 2%;
+        }
+        
+        .btn>button {
+            height: 36px;
+            width: 264px;
+            font-weight: bolder;
+            font-size: 17px;
+        }
+        
+        .btn:hover button {
+            background-color: #291FFA;
+            color: white;
+        }
+        
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+        }
+        
+        @media only screen and (max-width: 900px) {
+            .head {
+                height: 20%;
+            }
+            .head h1 {
+                width: 80%;
+                font-size: 1.3rem;
+                line-height: 1.2;
+                text-align: center;
+                margin: 2% 10% 2% 10%;
+            }
+            .input {
+                width: 90%;
+                height: auto;
+                margin-left: 5%;
+                margin-right: 5%;
+            }
+            .info {
+                width: 90%;
+                height: auto;
+                margin-left: 5%;
+                margin-right: 5%;
+            }
+            .info>p {
+                font-weight: bolder;
+                font-size: 20px;
+                color: #000000;
+                margin-left: 0%;
+                width: 100%;
+                float: right;
+            }
+            .info>p>input {
+                margin-right: 10px;
+                margin-top: -5px;
+                height: 22px;
+                width: 28%;
+                font-size: 17px;
+                font-weight: bold;
+                float: right;
+            }
+            .ket_qua {
+                width: 80%;
+                margin-left: 10%;
+                margin-right: 10%;
+                margin-top: 6%;
+            }
+            .btn {
+                width: 60%;
+                margin-left: 20%;
+                margin-right: 20%;
+            }
+            .btn>button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div style="background-color: #FFFFFF; height: 100%;">
+        <div class="head" ; align="center">
+            <h1>DỰ BÁO KHẢ NĂNG TỐT NGHIỆP ĐÚNG HẠN<br>DÀNH CHO SINH VIÊN NĂM THỨ 3</h1>
+        </div>
+        <form action="{{url_for('predict')}}" method="post" style="margin-top: 0%;">
+            <div class="info">
+                <p><span>Họ tên</span><input type="text" id="name" name="name" required></p>
+                <p><span>Lớp</span><input type="text" id="class" name="class" required></p>
+                <p><span>Mã sinh viên</span><input type="number" id="student_id" name="student_id" required></p>
+            </div>
+            <div id="inputs"></div>
+            <div class="btn">
+                <button type="submit">DỰ BÁO</button>
+            </div>
+        </form>
+        <br>
+        <br>
+        <div class="ket_qua" align="center">
+            {{ prediction_text }}
+        </div>
+
+    </div>
+</body>
+<script>
+    // tạo giao diện
+    let inputs = document.getElementById("inputs");
+    let romanNumerals = ["I", "II", "III", "IV", "V"];
+    for (let i = 1; i <= 5; i++) {
+        let inputDiv = document.createElement("div");
+        inputDiv.className = "input";
+        inputDiv.innerHTML = `
+        <p align="center">HỌC KÌ ${romanNumerals[i-1]}</p>
+        <p><span>Số tín chỉ đạt</span><input type="number" min="0" max="25" name="tcd${i}" required="required"></p>
+        <p><span>Số tín chỉ không đạt</span><input type="number" min="0" max="25" name="tcr${i}" required="required"></p>
+        <p><span>Điểm trung bình hệ 10</span><input type="number" min="0" max="10" step="0.1" name="dtb${i}" required="required"></p>
+    `;
+        inputs.appendChild(inputDiv);
+    }
+
+    // Lấy ra các giá trị đã lưu từ Local Storage
+    const inputNames = ['name', 'class', 'student_id', ...Array.from({
+        length: 5
+    }, (_, i) => `tcd${i+1}`), ...Array.from({
+        length: 5
+    }, (_, i) => `tcr${i+1}`), ...Array.from({
+        length: 5
+    }, (_, i) => `dtb${i+1}`)];
+    inputNames.forEach(name => {
+        let value = localStorage.getItem(`${name}Value`);
+        if (value) {
+            document.querySelector(`input[name='${name}']`).value = value;
+        }
+    });
+
+    // Cập nhật các giá trị trong Local Storage khi nhập một giá trị mới   
+    document.querySelector('form').addEventListener('submit', function() {
+        inputNames.forEach(name => {
+            let value = document.querySelector(`input[name='${name}']`).value;
+            localStorage.setItem(`${name}Value`, value);
+        });
+    });
+
+    // Xóa các giá trị đã lưu trong Local Storage khi tải lại trang
+    window.addEventListener('load', function() {
+        localStorage.clear();
+    });
+
+    // bẫy lỗi
+    function validateInput(name) {
+        var tcd = parseInt(document.getElementsByName("tcd" + name)[0].value);
+        var tcr = parseInt(document.getElementsByName("tcr" + name)[0].value);
+        var dtb = parseFloat(document.getElementsByName("dtb" + name)[0].value);
+
+        if (tcd + tcr > 25) {
+            alert("Lỗi: Tổng số tín chỉ đạt và rớt không được vượt quá 25. Vui lòng kiểm tra lại.");
+            return false;
+        }
+        if (dtb < 0 || dtb > 10) {
+            alert("Lỗi: Điểm trung bình phải nằm trong khoản 0 đến 10. Vui lòng kiểm tra lại.");
+            return false;
+        }
+        return true;
+    }
+
+    document.querySelector("form").addEventListener("submit", function(event) {
+        let isValid = true;
+        for (let i = 1; i <= 5; i++) {
+            if (!validateInput(i)) {
+                isValid = false;
+                break;
+            }
+        }
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+
+
+    document.querySelector("#name").addEventListener("input", function(event) {
+        this.value = this.value.replace(/\d/g, "");
+    });
+    document.querySelector("form").addEventListener("submit", function(event) {
+        let student_id = document.querySelector("#student_id").value;
+        if (student_id.length !== 10) {
+            event.preventDefault();
+            alert("Lỗi: Mã sinh viên phải đủ 10 kí tự. Vui lòng kiểm tra lại.");
+        }
+    });
+
+    document.querySelector('form').addEventListener('submit', function(event) {
+        let classValue = document.querySelector('input[name="class"]').value;
+        if (classValue.length > 0 && !isNaN(classValue[0])) {
+            event.preventDefault();
+            alert('Vui lòng kiểm tra lại lớp');
+        }
+    });
+</script>
+
+</html>
